@@ -185,7 +185,18 @@
   #inspPaint, #inspPass, #evBox { display: none; }
   body[data-tool=pen] #inspPaint, body[data-tool=rect] #inspPaint, body[data-tool=fill] #inspPaint, body[data-tool=pick] #inspPaint,
   body[data-tool=erase] #inspPaint, body[data-tool=shadow] #inspPaint { display: block; }
-  body[data-tool=erase] #brushCard, body[data-tool=erase] #layerCard, body[data-tool=pick] #layerCard, body[data-tool=shadow] #layerCard { display: none; }
+  body[data-tool=erase] #brushCard, body[data-tool=shadow] #layerCard { display: none; }
+  #layerCard .seg label:first-child { flex: 2.4; }
+  #layerCard .chip { align-self: flex-start; }
+  #layerCard .chip[hidden] { display: none; }
+  .card h3 .muted { text-transform: none; letter-spacing: 0; font-weight: var(--w-normal); }
+  .lyrvis { display: flex; align-items: center; gap: 2px; padding-left: var(--s2); border-left: var(--hair) solid var(--line); }
+  .lyrvis > span { color: var(--ink-faint); font-size: var(--text-label); padding-right: var(--s1); }
+  .lyrvis button { min-width: 28px; min-height: calc(var(--control-h) - 4px); padding: 0; border-radius: var(--r-sm); border: var(--hair) solid var(--accent);
+                   background: var(--accent-soft); color: var(--ink); cursor: pointer; font: inherit; }
+  .lyrvis button[aria-pressed="false"] { background: transparent; border: var(--hair) dashed var(--line-strong); color: var(--ink-faint); text-decoration: line-through; }
+  .lyrvis button.edit { box-shadow: inset 0 -3px 0 var(--accent); font-weight: var(--w-bold); }
+  .lyrvis button:focus-visible { outline: var(--ring) solid var(--accent); outline-offset: 1px; }
   body[data-tool=pass] #inspPass { display: block; }
   body[data-tool=event] #evBox { display: flex; }
 
@@ -396,6 +407,8 @@
       <label class="chip"><input type="checkbox" id="showPass"><span>Passability</span></label>
       <label class="chip"><input type="checkbox" id="showEvents" checked><span>Event</span></label>
       <label class="chip"><input type="checkbox" id="showRegions"><span>Region</span></label>
+      <div class="lyrvis" id="lyrVis" role="group" aria-label="Layer yang terlihat"><span>Layer</span>
+        <button data-z="0" aria-pressed="true" title="Tampilkan/sembunyikan layer 1">1</button><button data-z="1" aria-pressed="true" title="Tampilkan/sembunyikan layer 2">2</button><button data-z="2" aria-pressed="true" title="Tampilkan/sembunyikan layer 3">3</button><button data-z="3" aria-pressed="true" title="Tampilkan/sembunyikan layer 4">4</button></div>
       <div class="zoom"><button class="btn ghost" id="zOut" aria-label="Perkecil">−</button><output id="zLbl">100%</output><button class="btn ghost" id="zIn" aria-label="Perbesar">+</button></div>
       <button class="btn ghost vbhide" id="vbHide" aria-label="Sembunyikan bar tampilan (H)" title="Sembunyikan · H"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button>
       <button class="vbmini" id="vbMini" aria-label="Tampilkan bar tampilan (H)" title="Tampilkan · H"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span id="vbMiniLbl">Tampilan · 100%</span></button>
@@ -420,15 +433,11 @@
       <section class="card" id="brushCard"><h3>Kuas</h3>
         <div class="brush"><canvas id="brushPrev" width="48" height="48" aria-hidden="true"></canvas>
           <div><b id="brushInfo">Belum ada kuas</b><span class="muted" id="brushSub">Klik tile di palet (kiri).</span><span class="muted">Klik kanan di map untuk mengambil tile dari sana.</span></div></div></section>
-      <section class="card" id="layerCard"><h3>Ditaruh di layer</h3>
-        <div class="field"><span class="lbl">Lantai & dinding (sheet A)</span>
-          <div class="seg" role="radiogroup" aria-label="Layer lantai dan dinding">
-            <label><input type="radio" name="layerA" value="auto" checked><span>Otomatis</span></label><label><input type="radio" name="layerA" value="0"><span>Bawah</span></label><label><input type="radio" name="layerA" value="1"><span>Atas</span></label></div>
-          <p class="help">Otomatis: lantai di layer bawah; hiasan A2 kanan di atasnya.</p></div>
-        <div class="field"><span class="lbl">Objek (sheet B-E)</span>
-          <div class="seg" role="radiogroup" aria-label="Layer objek">
-            <label><input type="radio" name="layerO" value="auto" checked><span>Otomatis</span></label><label><input type="radio" name="layerO" value="2"><span>Layer 2</span></label><label><input type="radio" name="layerO" value="3"><span>Layer 3</span></label></div>
-          <p class="help">Otomatis: ke layer 3 kalau layer 2 di kotak itu sudah terisi tile lain.</p></div></section>
+      <section class="card" id="layerCard"><h3>Layer <span class="muted">· tombol 0-4</span></h3>
+        <div class="seg" role="radiogroup" aria-label="Layer yang diedit">
+          <label title="Otomatis (0)"><input type="radio" name="layer" value="auto" checked><span>Otomatis</span></label><label title="Layer 1 (1)"><input type="radio" name="layer" value="0"><span>1</span></label><label title="Layer 2 (2)"><input type="radio" name="layer" value="1"><span>2</span></label><label title="Layer 3 (3)"><input type="radio" name="layer" value="2"><span>3</span></label><label title="Layer 4 (4)"><input type="radio" name="layer" value="3"><span>4</span></label></div>
+        <p class="help" id="layerHelp"></p>
+        <label class="chip" id="dimChip"><input type="checkbox" id="dimOthers" checked><span>Redupkan layer lain</span></label></section>
       <section class="card"><h3>Cara pakai</h3><p class="help" id="toolHelp"></p></section>
     </div>
     <div id="inspPass">
@@ -486,7 +495,32 @@ const S = {
   undo: [], redo: [], stroke: null, rect: null, hover: null, dirty: false,
   sel: null, page: 0, evDrag: null, evClip: null, zoomI: 3, showOk: false,
   passMode: 'pass', flagEdits: new Map(), flagStroke: null, mapDirty: false,
+  layer: 'auto', dim: true, hideZ: [false, false, false, false],
 };
+
+// ---------------------------------------------------------------- layers (like RPG Maker MZ)
+// The map keeps 4 tile layers (z 0-3, shown as 1-4), then shadows (4) and regions (5) - the same data in MV and MZ.
+// Otomatis places tiles like the MV editor. A chosen layer (MZ's manual mode) puts any tile on that layer, and
+// Hapus, Pipet and Isi then work on that layer only. The game draws any tile on any of the 4 layers.
+const LAYER_HELP = {
+  auto: 'Seperti editor MV: lantai A ke layer 1, hiasan A2 kanan ke layer 2, objek B-E ke layer 3 (ke 4 kalau 3 sudah terisi). Hapus mengambil tile paling atas.',
+  0: 'Layer 1, dasar: lantai, tanah, air, dinding.',
+  1: 'Layer 2: hiasan di atas lantai (rumput, karpet, pinggiran A2).',
+  2: 'Layer 3: objek. Digambar di atas bayangan dinding.',
+  3: 'Layer 4: lapis paling atas, di atas objek layer 3.',
+};
+const LAYER_MANUAL = 'Tile apa pun (A sampai E) masuk ke layer ini. Hapus, Pipet dan Isi hanya memakai layer ini.';
+const PAINT_TOOLS = ['pen', 'rect', 'fill', 'pick', 'erase'];
+const MAP_CV = $('mapCanvas'), OVER_CV = $('overlay');
+const manualZ = () => S.layer === 'auto' ? null : S.layer;
+const dimActive = () => manualZ() !== null && S.dim && PAINT_TOOLS.includes(S.tool);
+// How strongly layer z is drawn on canvas g: hidden layers and (while editing one layer) the others dimmed.
+// Only the editor's own canvases; map previews show everything.
+function layerAlpha(g, z) {
+  if (g.canvas !== MAP_CV && g.canvas !== OVER_CV) return 1;
+  if (S.hideZ[z]) return 0;
+  return dimActive() && manualZ() !== z ? 0.35 : 1;
+}
 
 // ---------------------------------------------------------------- tile id helpers
 const isAuto = id => id >= A1 && id < TILE_MAX;
@@ -592,22 +626,24 @@ const inMap = (x, y) => x >= 0 && y >= 0 && x < W() && y < H();
 const at = (x, y, z) => S.cur.map.data[idx(x, y, z)];
 
 function renderCell(x, y) {
-  const g = S.mapCtx, dx = x * T, dy = y * T;
+  const g = S.mapCtx, dx = x * T, dy = y * T, a = [0, 1, 2, 3].map(z => layerAlpha(g, z));
+  const layer = z => { if (!a[z]) return; g.globalAlpha = a[z]; drawTile(g, at(x, y, z), dx, dy); };
   g.fillStyle = '#000'; g.fillRect(dx, dy, T, T);
-  drawTile(g, at(x, y, 0), dx, dy);
-  drawTile(g, at(x, y, 1), dx, dy);
+  layer(0); layer(1);
   const sh = at(x, y, 4);
-  if (sh) {
+  if (sh && a[0]) {
+    g.globalAlpha = a[0];
     g.fillStyle = 'rgba(0,0,0,0.5)';
     for (let i = 0; i < 4; i++) if (sh & (1 << i)) g.fillRect(dx + (i % 2) * HT, dy + Math.floor(i / 2) * HT, HT, HT);
   }
-  if (y > 0) {
+  if (y > 0 && a[1]) {
     const up = at(x, y - 1, 1), here = at(x, y, 1);
     const table = t => isA2(t) && (flagOf(t) & 0x80);
+    g.globalAlpha = a[1];
     if (table(up) && !table(here) && !(at(x, y, 0) >= A3 && at(x, y, 0) < TILE_MAX)) drawTableEdge(g, up, dx, dy);
   }
-  drawTile(g, at(x, y, 2), dx, dy);
-  drawTile(g, at(x, y, 3), dx, dy);
+  layer(2); layer(3);
+  g.globalAlpha = 1;
 }
 
 function renderAll() {
@@ -692,7 +728,10 @@ function drawEvent(g, ev) {
   g.fillStyle = 'rgba(30,60,120,0.25)'; g.fillRect(dx + 2, dy + 2, T - 4, T - 4);
   if (page) drawEventImage(g, page.image, dx, dy);
   // like the game: star (☆) tiles are drawn above characters, e.g. a stall's counter board in front of its keeper
-  for (let z = 0; z < 4; z++) { const id = at(ev.x, ev.y, z); if (id && (flagOf(id) & 0x10)) drawTile(g, id, dx, dy); }
+  for (let z = 0; z < 4; z++) {
+    const id = at(ev.x, ev.y, z), a = layerAlpha(g, z);
+    if (id && a && (flagOf(id) & 0x10)) { g.globalAlpha = a; drawTile(g, id, dx, dy); g.globalAlpha = 1; }
+  }
   g.strokeStyle = 'rgba(98,214,255,0.9)'; g.lineWidth = 2; g.strokeRect(dx + 2, dy + 2, T - 4, T - 4); g.lineWidth = 1;
 }
 
@@ -725,7 +764,7 @@ function set(x, y, z, v) {
   S.cur.map.data[i] = v;
   const key = x + ',' + y;
   S.touched.add(key);                      // redraw
-  if (z <= 1) S.touchedAuto.add(key);      // autotile shapes around it may change
+  if (z <= 3) S.touchedAuto.add(key);      // autotile shapes around it may change
   if (z === 0) S.touchedGround.add(key);   // the editor's wall shadows may change
 }
 
@@ -773,7 +812,7 @@ function settle() {
   cells.forEach(([x, y]) => { for (let j = -1; j <= 1; j++) for (let i = -1; i <= 1; i++) if (inMap(x + i, y + j)) around.add((x + i) + ',' + (y + j)); });
   around.forEach(s => {
     const [x, y] = s.split(',').map(Number);
-    for (const z of [0, 1]) {
+    for (const z of [0, 1, 2, 3]) {            // autotiles may sit on any layer (manual layers)
       const id = at(x, y, z);
       if (isAuto(id)) set(x, y, z, A1 + kindOf(id) * 48 + shapeFor(x, y, z, kindOf(id)));
     }
@@ -802,23 +841,22 @@ function upperA2(kind) {
   return s === 'A2' && l % 8 >= 4 && S.cur.tileset.mode === 1;   // A2 right half = decoration over the ground (Area tilesets)
 }
 
-const layerMode = name => (document.querySelector(`input[name=${name}]:checked`) || {}).value || 'auto';
 function applyBrushAt(x, y, ox, oy) {
   const b = S.brush; if (!b) return;
   if (b.type === 'region') { set(x, y, 5, b.value); return; }
+  const mz = manualZ();
   if (b.type === 'auto') {
-    const mode = layerMode('layerA');
-    const z = mode === 'auto' ? (upperA2(b.kind) ? 1 : 0) : +mode;
+    if (mz !== null) { set(x, y, mz, A1 + b.kind * 48); return; }
+    const z = upperA2(b.kind) ? 1 : 0;
     set(x, y, z, A1 + b.kind * 48);
-    if (mode === 'auto' && z === 0) set(x, y, 1, 0);
+    if (z === 0) set(x, y, 1, 0);
     return;
   }
   const id = b.ids[((oy % b.h) + b.h) % b.h][((ox % b.w) + b.w) % b.w];
-  if (b.ground) { set(x, y, 0, id); if (layerMode('layerA') === 'auto') set(x, y, 1, 0); return; }
-  const mode = layerMode('layerO');
-  let z = mode === 'auto' ? 2 : +mode;
-  if (mode === 'auto') { const under = at(x, y, 2); z = (!under || under === id) ? 2 : 3; }
-  set(x, y, z, id);
+  if (mz !== null) { set(x, y, mz, id); return; }
+  if (b.ground) { set(x, y, 0, id); set(x, y, 1, 0); return; }
+  const under = at(x, y, 2);
+  set(x, y, (!under || under === id) ? 2 : 3, id);
 }
 
 function stamp(x, y) {
@@ -828,12 +866,16 @@ function stamp(x, y) {
 }
 
 function eraseAt(x, y) {
+  const mz = manualZ();
+  if (mz !== null) { set(x, y, mz, 0); return; }
   for (const z of [3, 2, 1]) if (at(x, y, z)) { set(x, y, z, 0); return; }
 }
 
 function fillFrom(x, y) {
   const b = S.brush; if (!b) return;
+  const mz = manualZ(), same = id => (isAuto(id) ? 'k' + kindOf(id) : id);
   const key = b.type === 'region' ? (xx, yy) => at(xx, yy, 5)
+            : mz !== null ? (xx, yy) => same(at(xx, yy, mz))
             : (b.type === 'auto' || b.ground) ? (xx, yy) => (isAuto(at(xx, yy, 0)) ? 'k' + kindOf(at(xx, yy, 0)) : at(xx, yy, 0)) + '/' + (isAuto(at(xx, yy, 1)) ? 'k' + kindOf(at(xx, yy, 1)) : at(xx, yy, 1))
             : (xx, yy) => at(xx, yy, 2) + '/' + at(xx, yy, 3);
   const target = key(x, y), seen = new Set([x + ',' + y]), queue = [[x, y]];
@@ -849,6 +891,13 @@ function fillFrom(x, y) {
 
 function pickAt(x, y) {
   const done = test => { revealInPalette(test); if (S.tool === 'pick') setTool('pen'); };
+  const mz = manualZ();
+  if (mz !== null) {
+    const id = at(x, y, mz);
+    if (!id) { toast(`Layer ${mz + 1} kosong di kotak ini.`); return; }
+    if (isAuto(id)) { const kind = kindOf(id); setBrush({ type: 'auto', kind, w: 1, h: 1, label: describe(id) }); done(c => c.kind === kind); return; }
+    setBrush({ type: 'tiles', ids: [[id]], w: 1, h: 1, ground: mz <= 1, label: describe(id) }); done(c => c.id === id); return;
+  }
   for (const z of [3, 2]) {
     const id = at(x, y, z);
     if (id) { setBrush({ type: 'tiles', ids: [[id]], w: 1, h: 1, label: describe(id) }); done(c => c.id === id); return; }
@@ -1028,8 +1077,8 @@ function describe(id) {
 function showInfo(c) {
   if (!S.cur || !inMap(c.x, c.y)) { $('info').textContent = S.cur ? '-' : ''; return; }
   const p = passage(c.x, c.y), ev = eventAt(c.x, c.y);
-  $('info').textContent = (ev ? `[EV${String(ev.id).padStart(3, '0')} ${ev.name}]   ` : '') + `(${c.x}, ${c.y})   L0: ${describe(at(c.x, c.y, 0))}   L1: ${describe(at(c.x, c.y, 1))}   ` +
-    `L2: ${describe(at(c.x, c.y, 2))}   L3: ${describe(at(c.x, c.y, 3))}   region: ${at(c.x, c.y, 5)}   ` +
+  const mz = manualZ(), layers = [0, 1, 2, 3].map(z => `${mz === z ? '▸' : ''}${z + 1}: ${describe(at(c.x, c.y, z))}`).join('   ');
+  $('info').textContent = (ev ? `[EV${String(ev.id).padStart(3, '0')} ${ev.name}]   ` : '') + `(${c.x}, ${c.y})   ${layers}   region: ${at(c.x, c.y, 5)}   ` +
     `lewat: ${p.every(v => v) ? 'ya' : p.every(v => !v) ? 'tidak' : 'sebagian'}` +
     (S.tool === 'pass' ? `   ·   klik mengubah: ${(topTarget(c.x, c.y) || { label: '-' }).label}` : '');
 }
@@ -1987,7 +2036,45 @@ async function drawMapPreview(id, cv) {
 }
 
 // ---------------------------------------------------------------- tools, maps, saving
+// Tool help that follows the chosen layer.
+function toolHelp(t) {
+  const m = manualZ();
+  if (m === null) return TOOL_HELP[t];
+  if (t === 'erase') return `Klik atau geser untuk menghapus tile di layer ${m + 1} saja. Layer lain tidak tersentuh.`;
+  if (t === 'pick') return `Klik kotak di map untuk mengambil tile dari layer ${m + 1}. Klik kanan dengan alat apa pun juga mengambil dari layer itu.`;
+  if (t === 'fill') return `Klik satu kotak; kotak tetangga yang layer ${m + 1}-nya sama ikut terisi. Layer lain tidak dihitung.`;
+  return TOOL_HELP[t];
+}
+function stripLabel() {
+  const label = TOOLS.find(x => x[0] === S.tool)[1], m = manualZ();
+  $('stripRLbl').textContent = label + (m !== null && PAINT_TOOLS.includes(S.tool) ? ' · L' + (m + 1) : '');
+}
+// Choose the layer to edit: 'auto' or 0-3.
+function setLayer(v) {
+  const before = dimActive();
+  S.layer = v === 'auto' ? 'auto' : Math.max(0, Math.min(3, +v));
+  const r = document.querySelector(`input[name=layer][value="${S.layer}"]`); if (r) r.checked = true;
+  try { localStorage.setItem('novaLayer', String(S.layer)); } catch (e) { /* not kept */ }
+  refreshLayerUI();
+  if (S.cur && (before || dimActive())) renderAll();
+  if (S.cur && S.hover) showInfo(S.hover);
+}
+function refreshLayerUI() {
+  const m = manualZ();
+  $('layerHelp').textContent = LAYER_HELP[S.layer] + (m === null ? '' : ' ' + LAYER_MANUAL);
+  $('dimChip').hidden = m === null;
+  document.querySelectorAll('#lyrVis button').forEach(b => {
+    const z = +b.dataset.z;
+    b.setAttribute('aria-pressed', String(!S.hideZ[z]));
+    b.classList.toggle('edit', m === z);
+    b.title = (S.hideZ[z] ? 'Tampilkan' : 'Sembunyikan') + ` layer ${z + 1}` + (m === z ? ' (sedang diedit)' : '');
+  });
+  if (TOOL_HELP[S.tool]) $('toolHelp').textContent = toolHelp(S.tool);
+  stripLabel();
+}
+
 function setTool(t) {
+  const dimBefore = dimActive();
   S.tool = t;
   const tool = ([k, label, key]) => `<button class="tool" data-t="${k}" aria-pressed="${S.tool === k}" aria-keyshortcuts="${key}" title="${label} (${key})">` +
     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">${TOOL_ICON[k]}</svg><span>${label}</span><kbd aria-hidden="true">${key}</kbd></button>`;
@@ -1995,8 +2082,9 @@ function setTool(t) {
   $('tools').querySelectorAll('.tool').forEach(b => b.onclick = () => setTool(b.dataset.t));
   document.body.dataset.tool = t;
   const label = TOOLS.find(x => x[0] === t)[1];
-  $('inspTitle').textContent = label; $('stripRLbl').textContent = label; $('stripR').setAttribute('aria-label', 'Buka panel kanan: ' + label);
-  if (TOOL_HELP[t]) $('toolHelp').textContent = TOOL_HELP[t];
+  $('inspTitle').textContent = label; stripLabel(); $('stripR').setAttribute('aria-label', 'Buka panel kanan: ' + label);
+  if (TOOL_HELP[t]) $('toolHelp').textContent = toolHelp(t);
+  if (S.cur && dimBefore !== dimActive()) renderAll();
   $('palHint').textContent = t === 'pass' ? 'Klik tile = ubah passage-nya · geser = beberapa tile' : t === 'event' ? 'Palet tidak dipakai di alat Event' : 'Klik tile = kuas · geser = beberapa tile';
   renderPassBar(); updateLegend();
   if (S.cur) { renderOverlay(); renderEventPanel(); renderPalette(); }
@@ -2217,6 +2305,16 @@ $('undo').onclick = undo; $('redo').onclick = redo;
 $('mapFilter').oninput = renderMapList;
 $('zIn').onclick = () => { S.zoomI = Math.min(ZOOMS.length - 1, S.zoomI + 1); applyZoom(); };
 $('zOut').onclick = () => { S.zoomI = Math.max(0, S.zoomI - 1); applyZoom(); };
+document.querySelectorAll('input[name=layer]').forEach(r => r.onchange = () => setLayer(r.value));
+$('dimOthers').onchange = () => {
+  S.dim = $('dimOthers').checked;
+  try { localStorage.setItem('novaLayerDim', S.dim ? '1' : '0'); } catch (e) { /* not kept */ }
+  if (S.cur) renderAll();
+};
+document.querySelectorAll('#lyrVis button').forEach(b => b.onclick = () => {
+  const z = +b.dataset.z; S.hideZ[z] = !S.hideZ[z];
+  refreshLayerUI(); if (S.cur) renderAll();
+});
 ['showGrid', 'showPass', 'showEvents', 'showRegions'].forEach(id => $(id).onchange = () => { updateLegend(); if (S.cur) { renderOverlay(); renderPalette(); } });
 $('showOk').onchange = () => {
   S.showOk = $('showOk').checked;
@@ -2346,13 +2444,21 @@ window.addEventListener('keydown', e => {
   if (e.key === '[') { togglePanel('side'); return; }
   if (e.key === ']') { togglePanel('insp'); return; }
   if (k === 'h') { setVbMini(!$('viewbar').classList.contains('mini'), true); return; }
+  if (/^[0-4]$/.test(e.key) && !e.shiftKey) { e.preventDefault(); setLayer(e.key === '0' ? 'auto' : +e.key - 1); return; }
   const t = TOOLS.find(x => x[2].toLowerCase() === k);
   if (t) setTool(t[0]);
 });
 window.addEventListener('beforeunload', e => { if (S.dirty || S.flagEdits.size || S.tabs.some(tabDirty)) { e.preventDefault(); e.returnValue = ''; } });
 
 (async function init() {
+  try {
+    const l = localStorage.getItem('novaLayer'); if (l === 'auto' || /^[0-3]$/.test(l || '')) S.layer = l === 'auto' ? 'auto' : +l;
+    S.dim = localStorage.getItem('novaLayerDim') !== '0';
+  } catch (e) { /* defaults */ }
+  $('dimOthers').checked = S.dim;
+  const r = document.querySelector(`input[name=layer][value="${S.layer}"]`); if (r) r.checked = true;
   setTool('pen');
+  refreshLayerUI();
   try { const z = +localStorage.getItem('novaPalZoom'); if (z) S.palZoom = z; } catch (e) { /* default size */ }
   if (![0.25, 0.5, 0.75, 1].includes(S.palZoom)) S.palZoom = 0.75;
   showPalZoom();
